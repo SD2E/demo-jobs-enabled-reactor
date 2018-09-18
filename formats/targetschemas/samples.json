@@ -1,0 +1,29 @@
+{
+    "experiment_id": "tx_exp_1",
+    "challenge_problem": "YEAST_GATES",
+    "experiment_reference": "",
+    "lab": "Ginkgo",
+    "samples": [{
+        "sample_id": "tx_foo",
+        "strain": "tx_strain_1",
+        "contents": ["tx_media_1"],
+        "replicate": 1,
+        "inoculation_density": "0.00015:od600",
+        "temperature": "30:celsius",
+        "measurements": [{
+            "timepoint": "5:hour",
+            "files": [{
+                "name": "tx_foo.fcs",
+                "type": "FCS"
+            }],
+            "measurement_type": "FLOW",
+            "measurement_name": "CP / Protocol Specific",
+            "instrument_configuration": "agave://",
+            "reference_sequence": "agave://"
+        }],
+        "control_type": "HIGH_FITC",
+        "control_for": ["tx_bar_1", "tx_bar_2"],
+        "standard_type": "BEAD_SIZE",
+        "standard_for": ["tx_bar_1", "tx_bar_2"]
+    }]
+}

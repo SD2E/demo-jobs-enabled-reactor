@@ -1,0 +1,98 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "properties": {
+        "challenge_problem": {
+            "type": "string"
+        },
+        "experiment_id": {
+            "type": "string"
+        },
+        "experiment_reference": {
+            "type": "string"
+        },
+        "lab": {
+            "type": "string"
+        },
+        "samples": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "contents": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "experimental_media": {
+                        "type": "string"
+                    },
+                    "files": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "name": {
+                                    "type": "string"
+                                },
+                                "sha256": {
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "name",
+                                "sha256",
+                                "type"
+                            ]
+                        }
+                    },
+                    "replicate": {
+                        "type": [
+                            "null",
+                            "string"
+                        ]
+                    },
+                    "sample_id": {
+                        "type": "string"
+                    },
+                    "strain": {
+                        "type": "string"
+                    },
+                    "temperature": {
+                        "type": "string"
+                    },
+                    "timepoint": {
+                        "type": "string"
+                    },
+                    "tx_sample_id": {
+                        "type": "string"
+                    },
+                    "inoculation_density": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "contents",
+                    "experimental_media",
+                    "files",
+                    "replicate",
+                    "sample_id",
+                    "temperature",
+                    "timepoint",
+                    "tx_sample_id"
+                ]
+            }
+        }
+    },
+    "required": [
+        "challenge_problem",
+        "experiment_id",
+        "experiment_reference",
+        "lab",
+        "samples"
+    ]
+}

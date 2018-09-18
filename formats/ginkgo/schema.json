@@ -1,0 +1,73 @@
+{
+"$schema": "http://json-schema.org/draft-06/schema#",
+"title": "Ginkgo Samples Format",
+"additionalProperties": true,
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "content": {
+        "type": "object",
+        "properties": {
+          "reagent": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "concentration": {},
+                "id": {},
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ]
+            }
+          },
+          "molecule": {
+            "type": "array"
+          },
+          "strain": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ]
+            }
+          }
+        },
+        "required": [
+          "molecule",
+          "reagent",
+          "strain"
+        ]
+      },
+      "properties": {
+        "type": "object",
+        "properties": {
+          "SD2_replicate": {},
+          "SD2_timepoint": {},
+          "SD2_incubation_temperature": {}
+        }
+      },
+      "sample_id": {}
+    },
+    "required": [
+      "content",
+      "properties",
+      "sample_id"
+    ]
+  }
+}

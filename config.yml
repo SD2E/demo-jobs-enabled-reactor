@@ -1,0 +1,39 @@
+---
+debug: false
+logs:
+  level: DEBUG
+  token: ~
+catalogstore:
+  debug: false
+  uuid5_namespace: sd2e.org
+  storage_system: data-sd2e-community
+  base: /work/projects/SD2E-Community/prod/data
+  store: uploads/
+  root: uploads/
+  batch: 1000
+  collections:
+    updates: updates
+    fixity: datafiles
+    challenges: challenges
+    experiments: experiments
+    samples: samples
+    measurements: measurements
+    files: files
+    pipelines: pipelines
+    jobs: jobs
+mongodb:
+  authn: ~
+  database: catalog_dev
+storagesystems:
+  data-sd2e-community:
+    posix_path: /work/projects/SD2E-Community/prod/data
+only_extant_files: False
+downloaded: downloaded.json
+pipelines:
+  pipeline_uuid: f0f417f2-ba8b-5ac4-b421-255b69553391
+  updates_nonce: ~
+  authn: ~
+  pipeline_manager_id: G1p783PxpalBB
+  job_manager_id: G56vjoAVzGkkq
+  api_server: https://api.sd2e.org
+  database: catalog

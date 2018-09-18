@@ -1,0 +1,486 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "additionalProperties": false,
+    "definitions": {
+        "processing_level": {
+            "description": "a data processing level",
+            "type": "string",
+            "enum": ["0", "1", "2", "3"]
+        },
+        "time_unit": {
+            "description": "unit of temporal measurement",
+            "type": "string",
+            "enum": [
+                "year",
+                "month",
+                "week",
+                "day",
+                "hour",
+                "minute",
+                "second",
+                "millisecond",
+                "microsecond",
+                "nanosecond",
+                "picosecond",
+                "femtosecond"
+            ]
+        },
+        "fluid_unit": {
+            "description": "unit of fluid measurement",
+            "type": "string",
+            "enum": [
+                "%",
+                "M",
+                "g/L",
+                "X"
+            ]
+        },
+        "weight_unit": {
+            "description": "unit of dry weight measurement",
+            "type": "string",
+            "enum": [
+                "%",
+                "g"
+            ]
+        },
+        "temperature_unit": {
+            "description": "unit of measurement for temperature",
+            "type": "string",
+            "enum": [
+                "celsius",
+                "fahrenheit"
+            ]
+        },
+        "input_state": {
+            "description": "An input state for a strain circuit. Currently only encodes two input states.",
+            "type": "string",
+            "enum": [
+                "00",
+                "01",
+                "10",
+                "11"
+            ]
+        },
+        "circuit": {
+            "description": "Enumerated logic circuit, e.g for yeast_gates CP",
+            "type": "string",
+            "enum": [
+                "AND",
+                "NAND",
+                "OR",
+                "NOR",
+                "XOR",
+                "XNOR"
+            ]
+        },
+        "od_unit": {
+            "description": "unit of measurement for optical density",
+            "type": "string",
+            "enum": [
+                "od600"
+            ]
+        },
+        "temperature": {
+            "description": "a growth or measurement temperature",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "value": {
+                    "description": "numeric value",
+                    "type": "number"
+                },
+                "unit": {
+                    "$ref": "#/definitions/temperature_unit"
+                }
+            },
+            "required": [
+                "value",
+                "unit"
+            ]
+        },
+        "optical_density": {
+            "description": "an optical density specification or measurement",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "value": {
+                    "description": "numeric value",
+                    "type": "number"
+                },
+                "unit": {
+                    "$ref": "#/definitions/od_unit"
+                }
+            },
+            "required": [
+                "value",
+                "unit"
+            ]
+        },
+        "sd2_synbiohub_uri": {
+            "description": "SD2 SynBioHub reference",
+            "type": "string",
+            "pattern": "^https:\/\/hub\\.sd2e\\.org|NO PROGRAM DICTIONARY ENTRY"
+        },
+        "agave_files_uri": {
+            "description": "Agave API files reference",
+            "type": "string",
+            "pattern": "^agave:\/\/"
+        },
+        "mapped_name": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "label": {
+                    "description": "unique, human-readable string",
+                    "type": "string"
+                },
+                "lab_id": {
+                    "description": "the original value specified by the provider",
+                    "type": "string",
+                    "pattern": "^name\\.(uw_biofab|ginkgo|transcriptic)"
+                },
+                "sbh_uri": {
+                    "description": "an SD2 SynBioHub reference",
+                    "$ref": "#/definitions/sd2_synbiohub_uri"
+                },
+                "agave_uri": {
+                    "description": "an SD2 Agave API files reference (optional)",
+                    "$ref": "#/definitions/agave_files_uri"
+                },
+                "circuit": {
+                    "description": "a logic circuit enum for this sbh_uri, if available (e.g. a strain)",
+                    "$ref": "#/definitions/circuit"
+                },
+                "input_state": {
+                    "description": "an input state enum for this sbh_uri, if available (e.g. a strain)",
+                    "$ref": "#/definitions/input_state"
+                }
+            },
+            "required": [
+                "lab_id"
+            ]
+        },
+        "media_component": {
+            "type": "object",
+            "description": "component in a fluid growth medium",
+            "properties": {
+                "name": {
+                    "description": "a mapped lab id for a media reference",
+                    "$ref": "#/definitions/mapped_name"
+                },
+                "value": {
+                    "description": "numeric amount or fraction",
+                    "type": "number"
+                },
+                "unit": {
+                    "description": "unit of fluid measure",
+                    "$ref": "#/definitions/fluid_unit"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "name"
+            ]
+        },
+        "time_point": {
+            "type": "object",
+            "description": "point in a time series",
+            "additionalProperties": false,
+            "required": [
+                "value",
+                "unit"
+            ],
+            "properties": {
+                "value": {
+                    "description": "a numeric value",
+                    "type": "number"
+                },
+                "unit": {
+                    "description": "unit of temporal measure",
+                    "$ref": "#/definitions/time_unit"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "name or identifier for a particular time series"
+                }
+            }
+        },
+        "sample": {
+            "additionalProperties": false,
+            "description": "A lab sample and its metadata",
+            "properties": {
+                "sample_id": {
+                    "description": "sample id, internal to lab",
+                    "type": "string"
+                },
+                "strain": {
+                    "description": "strain reference, will be mapped by SBH Librarian",
+                    "$ref": "#/definitions/mapped_name"
+                },
+                "contents": {
+                    "description": "list of media/component references, will be mapped by SBH librarian",
+                    "items": {
+                        "$ref": "#/definitions/media_component"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                },
+                "replicate": {
+                    "description": "replicate number",
+                    "type": "integer"
+                },
+                "inoculation_density": {
+                    "description": "target inoculation density",
+                    "$ref": "#/definitions/optical_density"
+                },
+                "temperature": {
+                    "$ref": "#/definitions/temperature"
+                },
+                "measurements": {
+                    "description": "measurements for a sample",
+                    "items": {
+                        "$ref": "#/definitions/measurement"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                },
+                "control_type": {
+                    "description": "enumerated control type",
+                    "type": "string",
+                    "enum": [
+                        "HIGH_FITC",
+                        "EMPTY_VECTOR",
+                        "BASELINE",
+                        "TREATMENT_1",
+                        "TREATMENT_2",
+                        "BASELINE_MEDIA_PR"
+                    ]
+                },
+                "control_for": {
+                    "description": "list of samples this sample controls for",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                },
+                "standard_type": {
+                    "description": "enumerated standard type",
+                    "type": "string",
+                    "enum": [
+                        "BEAD_FLUORESCENCE",
+                        "BEAD_SIZE",
+                        "WATER",
+                        "LUDOX",
+                        "FLUORESCEIN"
+                    ]
+                },
+                "standard_attributes": {
+                    "description": "additional attributes used by standard enumerations",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "bead_model": {
+                            "description": "For the BEAD_FLUORESCENCE standard, the bead model used",
+                            "type": "string"
+                        },
+                        "bead_batch": {
+                            "description": "For the BEAD_FLUORESCENCE standard, the bead batch used",
+                            "type": "string"
+                        }
+                    }
+                },
+                "standard_for": {
+                    "description": "list of samples this sample is a standard for",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                },
+                "TMT_channel": {
+                    "description": "TMT tag/channel for proteomics",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "sample_id",
+                "contents"
+            ],
+            "type": "object"
+        },
+        "measurement": {
+            "additionalProperties": false,
+            "description": "A measurement for a sample, including its output file(s)",
+            "properties": {
+                "files": {
+                    "description": "files for a measurement",
+                    "items": {
+                        "$ref": "#/definitions/file"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                },
+                "timepoint": {
+                    "description": "timepoint condition",
+                    "$ref": "#/definitions/time_point"
+                },
+                "measurement_type": {
+                    "description": "enumerated measurement type",
+                    "type": "string",
+                    "enum": [
+                        "FLOW",
+                        "RNA_SEQ",
+                        "PLATE_READER",
+                        "PROTEOMICS"
+                    ]
+                },
+                "channel": {
+                    "description": "for flow, the name of the channel this measurement used",
+                    "type": "string"
+                },
+                "measurement_name": {
+                    "description": "CP/protocol specific name suggested by the labs",
+                    "type": "string"
+                },
+                "measurement_id": {
+                    "description": "a localized, unique measurement id relating a given sample to one or more files",
+                    "type": "string"
+                },
+                "measurement_group_id": {
+                    "description": "measurement group id, represents a single logical measurement from a lab that aggregates multiple related samples and files",
+                    "type": "string"
+                },
+                "instrument_configuration": {
+                    "description": "e.g. cytometer configuration",
+                    "type": "string"
+                },
+                "reference_sequence": {
+                    "description": "This field should be a path to the fasta/gff without the extension, ex. agave://data-sd2e-community/reference/novel-chassis/MG1655 where the references are named MG1655.fa and MG1655.gff",
+                    "type": "string"
+                }
+            },
+            "required": [
+                "measurement_type",
+                "files"
+            ],
+            "type": "object"
+        },
+        "file": {
+            "additionalProperties": false,
+            "description": "A file for a measurement",
+            "properties": {
+                "name": {
+                    "description": "filename",
+                    "type": "string",
+                    "pattern": ".*\\..*"
+                },
+                "type": {
+                    "description": "enumerated file type",
+                    "type": "string",
+                    "enum": [
+                        "FCS",
+                        "SRAW",
+                        "FASTQ",
+                        "CSV",
+                        "ZIP",
+                        "TXT",
+                        "MZML",
+                        "MSF"
+                    ]
+                },
+                "state": {
+                    "description": "raw or processed state",
+                    "type": "string",
+                    "enum": [
+                        "RAW",
+                        "PROCESSED"
+                    ]
+                },
+                "file_id": {
+                    "description": "file id, internal to lab",
+                    "type": "string"
+                },
+                "level": {
+                    "$ref": "#/definitions/processing_level"
+                }
+            },
+            "required": [
+                "name",
+                "type"
+            ],
+            "type": "object"
+        }
+    },
+    "description": "An Samples Metadata Schema",
+    "properties": {
+        "experiment_id": {
+            "description": "experiment id, internal to lab",
+            "type": "string"
+        },
+        "challenge_problem": {
+            "description": "challenge problem enumeration",
+            "enum": [
+                "YEAST_GATES",
+                "NOVEL_CHASSIS",
+                "RIBOSWITCHES",
+                "CELL_STATE",
+                "UNKNOWN"
+            ],
+            "type": "string"
+        },
+        "experiment_reference": {
+            "description": "experiment reference enumeration",
+            "type": "string",
+            "enum": [
+                "NovelChassis-NAND-Gate",
+                "NovelChassis-P-Fluorescens",
+                "NovelChassis-Parts-Discovery",
+                "NovelChassis-V-Natriegens-Titration",
+                "Overview-Immortality",
+                "PubDataAnal-Immortality",
+                "Riboswitches",
+                "Unknown",
+                "Yeast-Gates",
+                "Yeast-TetR-Characterization",
+                "YeastSTATES-3-Node-Bistable-Circuit",
+                "YeastSTATES-Aptamer-Based-Parts",
+                "YeastSTATES-Cello-Characterization",
+                "YeastSTATES-DNAseq-of-Yeastgates1-Strains",
+                "YeastSTATES-Gander-Operational-Envelope",
+                "YeastSTATES-gRNA-Seq-Diagnosis"
+            ]
+        },
+        "experiment_reference_url": {
+            "description": "experiment reference url, e.g. google drive link",
+            "type": "string",
+            "pattern": "^https://docs.google.com/document"
+        },
+        "lab": {
+            "description": "lab identifier",
+            "enum": [
+                "Ginkgo",
+                "Transcriptic",
+                "UW_BIOFAB"
+            ],
+            "type": "string"
+        },
+        "samples": {
+            "description": "a lab sample and its metadata",
+            "items": {
+                "$ref": "#/definitions/sample"
+            },
+            "minItems": 1,
+            "type": "array"
+        }
+    },
+    "required": [
+        "experiment_id",
+        "challenge_problem",
+        "experiment_reference",
+        "lab",
+        "samples"
+    ],
+    "title": "SD2 samples specification",
+    "type": "object"
+}
