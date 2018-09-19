@@ -76,6 +76,11 @@ function read_reactor_rc() {
       log "No reactors config file ${REACTOR_RC} found"
   fi
 
+  if ((DOCKER_USE_COMMIT_HASH));
+  then
+    DOCKER_IMAGE_VERSION=$(git rev-parse --short HEAD)
+  fi
+
   CONTAINER_IMAGE="$DOCKER_HUB_ORG/${DOCKER_IMAGE_TAG}:${DOCKER_IMAGE_VERSION}"
 
   if [ -z "${REACTOR_SECRETS_FILE}" ]; then

@@ -28,9 +28,9 @@ if [ ! -f "${REACTOR_SECRETS_FILE}" ]; then
 fi
 # This emulates Abaco's environment-setting behavior
 log "Reading in container secrets file..."
-DOCKER_ENVS_FILE=$(python ${DIR}/secrets_to_docker_envs.py ${REACTOR_SECRETS_FILE})
+DOCKER_ENVS=$(python ${DIR}/secrets_to_docker_envs.py ${REACTOR_SECRETS_FILE})
 # Set the Reactor.local flag. Also ensures DOCKER_ENVS is not empty
-DOCKER_ENVS="-e LOCALONLY=1 ${DOCKER_ENVS_FILE} ${DOCKER_ENVS_SET}"
+DOCKER_ENVS="-e LOCALONLY=1 ${DOCKER_ENVS}"
 
 # Agave API integration
 AGAVE_CREDS="${AGAVE_CACHE_DIR}"
@@ -59,7 +59,9 @@ log "Container name: ${CNAME}"
 function finish {
   log "Forcing ${CNAME} to stop..."
   docker stop ${CNAME} ; log "(Stopped)"
-  # rm -rf ${TEMP}
+  if ((! NOCLEANUP)); then
+    rm -rf ${TEMP}
+  fi
 }
 trap finish EXIT
 
@@ -71,9 +73,5 @@ docker run -t -v ${AGAVE_CREDS}:/root/.agave:rw \
            ${CONTAINER_IMAGE}
 
 DOCKER_EXIT_CODE="$?"
-
-# if [ "$DOCKER_EXIT_CODE" == 0 ]; then
-#     rm -rf ${TEMP}
-# fi
 
 exit ${DOCKER_EXIT_CODE}
