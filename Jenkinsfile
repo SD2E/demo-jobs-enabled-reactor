@@ -1,5 +1,5 @@
 // JOB_BASE_NAME is not reliably available in Multibranch Pipeline
-def CLIENT_PREFIX = "pipeline-jobs-manager"
+def CLIENT_PREFIX = "jobs-demo"
 def deployedActorId = ""
 pipeline {
     agent any
@@ -7,9 +7,9 @@ pipeline {
         disableConcurrentBuilds()
     }
     environment {
-        CLIENT_PREFIX     = "pipeline-jobs-manager"
-        ACTOR_ID_PROD     = ''
-        ACTOR_ID_STAGING  = ''
+        CLIENT_PREFIX     = "jobs-demo"
+        ACTOR_ID_PROD     = 'wKAxBrkWekMjb'
+        ACTOR_ID_STAGING  = 'D0ZxR0wPLpoJA'
         ACTOR_WORKERS = 1
         PYTEST_OPTS       = '-s -vvv'
         ABACO_DEPLOY_OPTS = ''
@@ -23,7 +23,7 @@ pipeline {
         REGISTRY_PASSWORD = credentials('sd2etest-dockerhub-password')
         REGISTRY_ORG      = credentials('sd2etest-dockerhub-org')
         PATH = "${HOME}/bin:${HOME}/sd2e-cloud-cli/bin:${env.PATH}"
-        SECRETS_FILE = credentials('data-catalog-secrets-json-prod')
+        SECRETS_FILE = credentials('data-catalog-secrets-json-dev')
         SECRETS_FILE_STAGING = credentials('data-catalog-secrets-json-dev')
         // CONFIG_EXTRA_FILE = credentials('data-catalog-config-extra-yml-prod')
         // CONFIG_EXTRA_FILE_STAGING = credentials('data-catalog-config-extra-yml-prod')

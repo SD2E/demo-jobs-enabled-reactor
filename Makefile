@@ -24,6 +24,8 @@ tests: tests-pytest tests-local
 tests-pytest:
 	bash $(SCRIPT_DIR)/run_container_process.sh $(PYTHON) -m "pytest" $(PYTEST_DIR) $(PYTEST_OPTS)
 
+tests-integration: tests-local
+
 tests-local:
 	bash $(SCRIPT_DIR)/run_container_message.sh tests/data/01.json
 
