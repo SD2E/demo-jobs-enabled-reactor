@@ -64,25 +64,31 @@ if [ -d "${AGAVE_CREDS}" ]; then
 fi
 
 envopts=""
-# API_KEY=$(jq -r ._REACTOR_SLACK_WEBHOOK ${DIR}/../secrets.json)
-# envopts="${envopts} -e _REACTOR_SLACK_WEBHOOK=$API_KEY"
-
 if ((! REACTOR_LOCALONLY )); then
     envopts="${envopts} -e LOCALONLY=1"
 fi
+
+# Populate reactor env from secrets.json
+if [ ! -f "${REACTOR_SECRETS_FILE}" ]; then
+    die "No secrets.json found"
+fi
+# This emulates Abaco's environment-setting behavior
+log "Reading in container secrets file..."
+DOCKER_ENVS=$(python ${DIR}/secrets_to_docker_envs.py ${REACTOR_SECRETS_FILE})
+envopts="${envopts} ${DOCKER_ENVS}"
 
 # Tweak config for Docker depending on if we're running under CI
 dockeropts="${REACTOR_RUN_OPTS}"
 detect_ci
 if ((UNDER_CI)); then
-  # If running a Dockerized process with a volume mount
-  # written files will be owned by root and unwriteable by
-  # the CI user. We resolve this by setting the group, which
-  # is the same approach we use in the container runner
-  # that powers container-powered Agave jobs
-  dockeropts="-t ${dockeropts} --user=0:${CI_GID}"
+    # If running a Dockerized process with a volume mount
+    # written files will be owned by root and unwriteable by
+    # the CI user. We resolve this by setting the group, which
+    # is the same approach we use in the container runner
+    # that powers container-powered Agave jobs
+    dockeropts="-t ${dockeropts} --user=0:${CI_GID}"
 else
-  dockeropts="-it ${dockeropts}"
+    dockeropts="-it ${dockeropts}"
 fi
 
 docker run ${dockeropts} ${envopts} ${MOUNTS} ${CONTAINER_IMAGE} ${@}
