@@ -12,7 +12,7 @@ storagesystems:
 only_extant_files: False
 downloaded: downloaded.json
 pipelines:
-  pipeline_uuid: f0f417f2-ba8b-5ac4-b421-255b69553391
+  pipeline_uuid: 0ae229a8-45e5-571b-9682-5f1cf83a184c
   updates_nonce: ~
   authn: ~
   pipeline_manager_id: G1p783PxpalBB
