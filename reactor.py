@@ -1,23 +1,40 @@
 from pprint import pprint
-from reactors.runtime import Reactor, agaveutils
 from requests.exceptions import HTTPError
-from datacatalog.pipelinejobs import PipelineJob
+
+from reactors.runtime import Reactor, agaveutils
+from datacatalog.managers.pipelinejobs import ManagedPipelineJob
+
 
 def main():
 
     rx = Reactor()
     m = rx.context.message_dict
+    pprint(rx.context)
 
-    job = PipelineJob(rx, 'transcriptic', 'Yeast-Gates', 'sample.transcriptic.aq1btsj94wghbk',
-                      'measurement.transcriptic.sample.transcriptic.aq1btsj94wghbk.2')
+    job = ManagedPipelineJob(rx.settings.mongodb,
+                             rx.settings.pipelines.job_manager_id,
+                             rx.settings.pipelines.updates_nonce,
+                             pipeline_uuid=rx.pipelines.pipeline_uuid,
+                             agent=rx.id,
+                             data=m.get('data', {}),
+                             sample_id='sample.transcriptic.aq1bsxp36447z6',
+                             session=rx.nickname,
+                             task=rx.execid
+                             )
 
-    job.setup(data=m)
+    job.setup()
     # Set up and launch Agave jobs with callbacks based on job.callback
 
     job_def = {'appId': 'hello-agave-cli-0.1.0u1',
                'name': rx.nickname,
                'notifications': [
-                   {'event': '*',
+                   {'event': 'RUNNING',
+                    'persistent': True,
+                    'url': job.callback + '&status=${STATUS}'},
+                   {'event': 'FINISHED',
+                    'persistent': False,
+                    'url': job.callback + '&status=${STATUS}'},
+                   {'event': 'FAILED',
                     'persistent': False,
                     'url': job.callback + '&status=${STATUS}'}]}
 

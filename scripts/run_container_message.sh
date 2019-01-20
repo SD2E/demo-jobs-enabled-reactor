@@ -10,13 +10,13 @@ detect_ci
 
 # Load up the message to send
 if [ ! -z "$1" ]; then
-  MESSAGE_PATH=$1
+    MESSAGE_PATH=$1
 else
-  MESSAGE_PATH="tests/data/local-message-01.json"
+    MESSAGE_PATH="tests/data/local-message-01.json"
 fi
 MESSAGE=
 if [ -f "${MESSAGE_PATH}" ]; then
-    MESSAGE=$(cat ${MESSAGE_PATH})
+    MESSAGE=$(jq -rc . ${MESSAGE_PATH})
 fi
 if [ -z "${MESSAGE}" ]; then
     die "Message not readable from ${MESSAGE_PATH}"
@@ -24,7 +24,7 @@ fi
 
 # Read Docker envs from secrets.json
 if [ ! -f "${REACTOR_SECRETS_FILE}" ]; then
-  die "No secrets.json found"
+    die "No secrets.json found"
 fi
 # This emulates Abaco's environment-setting behavior
 log "Reading in container secrets file..."
@@ -39,11 +39,11 @@ if [ ! -d "${AGAVE_CREDS}" ]; then
     AGAVE_CREDS="${HOME}/.agave"
     # Refresh them with a call to Agave.restore()
     if ((AGAVE_PREFER_PYTHON)); then
-      log "Refreshing using AgavePy"
-      eval python ${DIR}/refresh_agave_credentials.py
+        log "Refreshing using AgavePy"
+        eval python ${DIR}/refresh_agave_credentials.py
     else
-      log "Refreshing using CLI"
-      auth-tokens-refresh -S
+        log "Refreshing using CLI"
+        auth-tokens-refresh -S
     fi
 fi
 if [ ! -f "${AGAVE_CREDS}/current" ]; then
@@ -51,26 +51,26 @@ if [ ! -f "${AGAVE_CREDS}/current" ]; then
 fi
 
 TEMP=`mktemp -d $PWD/tmp.XXXXXX` && \
-  echo "Working directory: $TEMP"
+echo "Working directory: $TEMP"
 
 CNAME=${CI_CONTAINER_NAME}
 log "Container name: ${CNAME}"
 
 function finish {
-  log "Forcing ${CNAME} to stop..."
-  docker stop ${CNAME} ; log "(Stopped)"
-  if ((! NOCLEANUP)); then
-    rm -rf ${TEMP}
-  fi
+    log "Forcing ${CNAME} to stop..."
+    docker stop ${CNAME} ; log "(Stopped)"
+    if ((! NOCLEANUP)); then
+        rm -rf ${TEMP}
+    fi
 }
 trap finish EXIT
 
 docker run -t -v ${AGAVE_CREDS}:/root/.agave:rw \
-           --name ${CNAME} \
-           -v ${TEMP}:/mnt/ephemeral-01:rw \
-           -e MSG="${MESSAGE}" \
-           ${DOCKER_ENVS} \
-           ${CONTAINER_IMAGE}
+--name ${CNAME} \
+-v ${TEMP}:/mnt/ephemeral-01:rw \
+-e MSG="${MESSAGE}" \
+${DOCKER_ENVS} \
+${CONTAINER_IMAGE}
 
 DOCKER_EXIT_CODE="$?"
 
