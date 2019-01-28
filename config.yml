@@ -6,16 +6,11 @@ logs:
 mongodb:
   authn: ~
   database: catalog_dev
-storagesystems:
-  data-sd2e-community:
-    posix_path: /work/projects/SD2E-Community/prod/data
-only_extant_files: False
-downloaded: downloaded.json
 pipelines:
-  pipeline_uuid: 0ae229a8-45e5-571b-9682-5f1cf83a184c
-  updates_nonce: ~
-  authn: ~
-  pipeline_manager_id: G1p783PxpalBB
-  job_manager_id: G56vjoAVzGkkq
-  api_server: https://api.sd2e.org
-  database: catalog
+  pipeline_uuid: 106026ac-d0b3-5b01-8a84-64b010d0b58f
+  pipeline_manager_id: kOYmxWRq5X4K7
+  pipeline_manager_nonce: ~
+  job_manager_id: MEzqaw4rkWZoK
+  job_manager_nonce: ~
+  job_indexer_id: Pw3eRxrqLZGmp
+  job_indexer_nonce: ~
