@@ -27,7 +27,7 @@ tests-pytest:
 tests-integration: tests-local
 
 tests-local:
-	bash $(SCRIPT_DIR)/run_container_message.sh tests/data/01.json
+	bash $(SCRIPT_DIR)/run_container_message.sh tests/data/02.json
 
 tests-deployed:
 	echo "not implemented"

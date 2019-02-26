@@ -2,7 +2,7 @@ from pprint import pprint
 from requests.exceptions import HTTPError
 
 from reactors.runtime import Reactor, agaveutils
-from datacatalog.managers.pipelinejobs import ReactorManagedPipelineJob
+from datacatalog.managers.pipelinejobs import ReactorManagedPipelineJob as Job
 
 
 def main():
@@ -29,9 +29,7 @@ def main():
     # as well as how to pass your own archive_path, turn off instanced
     # paths, and more.
 
-    job = ReactorManagedPipelineJob(
-        rx, data=m.get("data", {}), sample_id=m.get("sample_id", None)
-    )
+    job = Job(rx, data=m.get("data", {}), experiment_id=m.get("experiment_id", None))
 
     # At this point, there is an entry in the MongoDB.jobs collection, the
     # job UUID has been assigned, archive_path has been set, and the contents
@@ -42,100 +40,84 @@ def main():
     rx.logger.info("PipelineJob.uuid: {}".format(job.uuid))
     # At this point, but no later in the job lifecycle, the job can be erased
     # with job.cancel(). If there is a need to denote failure after the job has
-    # started running, that is achieved via job.fail().
+    # started running, that should be achieved via job.fail().
 
     # Launching an Agave job from within a Reactor is well-documented
-    # elsewhere. Briefly, create a job definition dict, following the
-    # Agave API documentation then send it to agavepy.jobs.submit().
+    # elsewhere. This example extends the common use base by configuring the
+    # Agave job to POST data to a HTTP URL when it reaches specific stages in
+    # its lifecycle. These POSTS can be configured and that is leveraged to
+    # notify the PipelineJobs system as to the status of the Agave job. The
+    # example show here is a generalized solution and can be used by any
+    # Agave job to communicate with an Abaco Reactor.
     #
-    # This example extends the basic launch mechanic by configuring the Agave
-    # job to send events to a HTTP URL when it reaches specific stages in
-    # the Agave jobs lifecycle. The mechanism that will be demonstrated is
-    # a generalized solution to sending Agave event messages to an Abaco
-    # Reactor. This is because the PipelineJobs system is built from
-    # Reactors!
-    #
-    # Another difference is that the archive path (the destination for output
-    # files from the job) is very explicitly set to a value that was defined
-    # by the PipelineJobs system.
+    # Another key difference between this example and the common use case is
+    # that the job's archivePath (i.e. the final destination for job output
+    # files) is explicitly set. Specifically, it is set to a path that is
+    # managed by the ManagedPipelineJob class.
 
-    # A basic Agave job definition
     job_def = {
-        "appId": "hello-agave-cli-0.1.0u1",
-        "name": rx.nickname,
-        "parameters": [],
-        "maxRunTime": "00:05:00",
+        "appId": rx.settings.agave_app_id,
+        "name": "word-count-" + rx.nickname,
+        "inputs": m.get("data", {}).get("inputs", {}),
+        "maxRunTime": "00:15:00",
     }
 
-    # Configure the Agave job to write where PipelineJobs wants it to
+    # First, set the preferred archive destination and ensure the job archives
     job_def["archivePath"] = job.archive_path
     job_def["archiveSystem"] = job.archive_system
     job_def["archive"] = True
 
-    # Add event notifications to the Agave job definition
+    # Second, add event notifications to the job definition
     #
-    # Agave has a lot of job statuses, and the PipelineJobs System
+    # Agave has many job statuses, and the PipelineJobs System
     # has mappings for all of them. The most important, which are
-    # demonstrated below, are RUNNING, FINISHED, and FAILED. These
-    # correspond to PipelineJobs states, as that system is intended to
-    # extend rather than replace Agave's job lifecycle.
+    # demonstrated below, are RUNNING, ARCHIVING_FINISHED, and FAILED.
+    # These correspond to their analagous PipelineJobs states. In this
+    # example, three notifications are added to the job definition.
     #
-    # Three Agave notifications are appended to the job definition.
+    # Notifications 101: Agave notifications have three parts: 1) status,
+    # 2) Whether the subscription to the event is 'persistent'. If so, the
+    # Agave system will send a notification every time the event occurs. If not,
+    # only the first occurence will result in a notification. 3) The URL
+    # destination (or callback) to which the HTTP POST will be sent.
     #
-    # An Agave notification is comprised of three fields in a dict-like object
-    #
-    # 1) The Agave jobs 'event' of interest 2) Whether the subscription to
-    # the event is 'persistent'. If so, will send a notification every time the
-    # event happens and only on first occurrence if not. 3) The URL destination
-    # for Agave to send an HTTP POST to. This is where the PipelineJob magic
-    # happens. Note that job has an attribute 'callback'. This is created at
-    # job.setup() and is a preauthorized URL allowing a POST to be sent to
-    # the PipelineJobsManager reactor, routed to manage a specific PipelineJob.
+    # This is where the integration between Agave and Reactors and the Pipeline
+    # system happens. The Job object, after it has been set up, has a property
+    # "callback" which is a URL pointing to the Jobs Manager Reactor, complete
+    # with an authorization key. Posting Agave events to this endpoint will
+    # advance the state of the Job,
 
     job_def["notifications"] = [
         {
             "event": "RUNNING",
             "persistent": True,
-            "url": job.callback + "&status=${STATUS}",
+            "url": job.callback + "&status=${JOB_STATUS}",
         },
         {
-            "event": "FINISHED",
+            "event": "ARCHIVING_FINISHED",
             "persistent": False,
-            "url": job.callback + "&status=${STATUS}",
+            "url": job.callback + "&status=FINISHED",
         },
         {
             "event": "FAILED",
             "persistent": False,
-            "url": job.callback + "&status=${STATUS}",
+            "url": job.callback + "&status=${JOB_STATUS}",
         },
     ]
 
-    # Submit the Agave job.
-    #
-    # The Agave job will send event updates for our job to PipelineJobsManager
-    # even after execution of this Reactor has completed. This is an example
-    # of asynchronous, event-driven programming, and can be very scalable and
-    # composable into complex workflows.
-    #
-    # Note: In this implementation, the Agave job is launched and
-    # the Reactor does not block awaiting its completion. Advancement of the
-    # PipelineJobs job state is delegated entirely to Agave notifications.
-    #
-    # Alternatively, one could skip adding notifications that set terminal
-    # PipelineJobs states, await the result of the Agave job synchronously, and
-    # programatically advance the job state using job.fail() or job.finish().
-    # Both are valid approaches, but the asynchronous method yields better
-    # scaling, resilience, and composability.
-    #
+    # Submit the Agave job: The Agave job will send event its updates to
+    # our example job via the Jobs Manager Reactor, This will take place even
+    # after the execution of this Reactor has concluded. This is a good example
+    # of asynchronous, event-driven programming. This is a remarkably scalabe,
+    # and resilient approach, and its innate composability suggests creation of
+    # complex, internlinked workflows.
     try:
         resp = rx.client.jobs.submit(body=job_def)
         ag_job_id = None
         if "id" in resp:
             ag_job_id = resp["id"]
-            # Optional: Send a "run" event to the PipelineJob with the
-            # Agave job ID. The PipelineJob will be set to 'RUNNING' by the
-            # Agave job via the notifications configured above even if
-            # job.run() is not called here.
+            # Now, send a "run" event to the Job, including for the sake of
+            # keeping good records, the Agave job ID.
             job.run({"launched": ag_job_id})
         else:
             # Fail the PipelineJob if Agave job fails to launch
@@ -151,14 +133,17 @@ def main():
         # Report what is likely to be an error with this Reactor, the Data
         # Catalog, or the PipelineJobs system components
         job.fail({"cause": str(exc)})
-        rx.on_failure("Failed to launch pipeline", exc)
+        rx.on_failure("Failed to launch {}".format(job.uuid), exc)
 
-    # Optional: Send an 'update' event to put a note in the PipelineJob's
-    # history commemorating successful execution of this Reactor.
+    # Optional: Send an 'update' event to the PipelineJob's
+    # history commemorating a successful run for this Reactor.
     try:
-        job.update({"note": "Reactor has run to completion"})
+        job.update({"note": "Reactor {} ran to completion".format(rx.uid)})
     except Exception:
         pass
+
+    # I like to annotate the logs with a terminal success message
+    rx.on_success("Launched Agave Job in {} usec".format(rx.elapsed()))
 
 
 if __name__ == "__main__":

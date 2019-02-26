@@ -2,7 +2,7 @@
     "experiment_id": "experiment.tacc.10001",
     "data": {
         "inputs": {
-            "input1": "agave://data-sd2e-community/sample/tacc-cloud/wc-sample.txt"
+            "input1": "agave://data-sd2e-community/reference/novel_chassis/uma_refs/amin_genes.gff"
         }
     }
 }

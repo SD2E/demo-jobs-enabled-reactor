@@ -1,12 +1,5 @@
 FROM sd2e/reactors:python3-edge
-
-ARG DATACATALOG_BRANCH=0_2_0
-
-FROM sd2e/reactors:python3-edge
-
-# reactor.py, config.yml, and message.jsonschema will be automatically
-# added to the container when you run docker build or abaco deploy
-# ADD tests/data /data
+ARG DATACATALOG_BRANCH=2_0
 
 # Comment out if not actively developing python-datacatalog
 RUN pip uninstall --yes datacatalog

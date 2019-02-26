@@ -1,0 +1,44 @@
+{ "checkpointable": false,
+  "name": "${APP_NAME}",
+  "executionSystem": "${APP_EXECUTIONSYSTEM}",
+  "executionType": "${APP_TYPE}",
+  "deploymentPath": "apps/word-count",
+  "deploymentSystem": "data-sd2e-app-assets",
+  "helpURI": "https://sd2e.org/develop/",
+  "label": "Word Count (${APP_TYPE})",
+  "longDescription": "Automatically generated: ${GENDATE}",
+  "modules": [],
+  "ontology": ["http://sswapmeet.sswap.info/agave/apps/Application"],
+  "parallelism": "SERIAL",
+  "shortDescription": "How many words are in a file? Guess randomly or use ADVanCEd aNalYTIcaL tECHnIqUES to figure it out!",
+  "tags": ["test", "hello"],
+  "templatePath": "code/runner.sh",
+  "testPath": "code/tester.sh",
+  "version": "${APP_VERSION}",
+  "defaultMaxRunTime": "00:05:00",
+  "inputs": [
+    {
+      "id": "input",
+      "details": {
+        "label": "Plain text file",
+        "showAttribute": false
+      },
+      "semantics": {
+        "minCardinality": 1,
+        "ontology": [
+          "http://sswapmeet.sswap.info/util/Sequence"
+        ],
+        "fileTypes": [
+          "text-0"
+        ]
+      },
+      "value": {
+        "default": "agave://data-tacc-work-vaughn/examples/wc/test.txt",
+        "required": true,
+        "visible": true
+      }
+    }
+  ],
+  "parameters": [],
+  "outputs": []
+}

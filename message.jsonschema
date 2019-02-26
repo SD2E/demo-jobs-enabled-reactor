@@ -1,18 +1,29 @@
 {
 	"$schema": "http://json-schema.org/draft-07/schema#",
-	"title": "DemoPipelinesJob",
-	"description": "Launch an example Reactor with Pipelines integration",
+	"$id": "https://schema.catalog.sd2e.org/schemas/abaco_json_message.json",
+	"title": "DemoJob",
+	"description": "Launches an example Reactor with Pipelines integration",
 	"type": "object",
 	"properties": {
-		"sample_id": {
-			"description": "A known sample identifier",
-			"type": "string"
+		"experiment_id": {
+			"$ref": "namespaced_identifier.json"
 		},
 		"data": {
-			"description": "Optional run-time parameterization of the job",
-			"type": "object"
+			"type": "object",
+			"properties": {
+				"inputs": {
+					"type": "object",
+					"properties": {
+					"input1": {
+						"$ref": "agave_files_uri.json"
+					}
+					},
+					"required": ["input1"]
+				}
+			},
+			"required": ["inputs"]
 		}
 	},
-	"required": [],
+	"required": ["experiment_id", "data"],
 	"additionalProperties": false
 }

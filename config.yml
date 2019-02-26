@@ -1,13 +1,14 @@
 ---
 debug: false
+agave_app_id: word-count-0.1u1
 logs:
   level: DEBUG
   token: ~
 mongodb:
   authn: ~
-  database: catalog_dev
+  database: catalog_staging
 pipelines:
-  pipeline_uuid: 106026ac-d0b3-5b01-8a84-64b010d0b58f
+  pipeline_uuid: 106c46ff-8186-5756-a934-071f4497b58d
   pipeline_manager_id: kOYmxWRq5X4K7
   pipeline_manager_nonce: ~
   job_manager_id: MEzqaw4rkWZoK
