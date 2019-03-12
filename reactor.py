@@ -41,6 +41,7 @@ def main():
     token = get_admin_token(rx.settings.admin_token_key)
     try:
         job.reset(token=token)
+        # job.ready(token=token)
     except Exception as exc:
         rx.logger.warning('Reset failed: {}'.format(exc))
 
