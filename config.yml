@@ -17,3 +17,4 @@ pipelines:
   job_indexer_nonce: ~
   permission_manager: pems-agent.prod
   process_uuid: 117a32a1-457c-5bfe-bded-ed0ca99e53f8
+admin_token_key: ~

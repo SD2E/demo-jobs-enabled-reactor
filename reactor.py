@@ -3,6 +3,7 @@ from requests.exceptions import HTTPError
 
 from reactors.runtime import Reactor, agaveutils
 from datacatalog.managers.pipelinejobs import ReactorManagedPipelineJob as Job
+from datacatalog.tokens import get_admin_token
 
 
 def main():
@@ -29,13 +30,20 @@ def main():
     # as well as how to pass your own archive_path, turn off instanced
     # paths, and more.
 
-    job = Job(rx, data=m.get("data", {}), experiment_id=m.get("experiment_id", None))
+    job = Job(rx, data=m.get("data", {}),
+              experiment_id=m.get("experiment_id", None))
 
     # At this point, there is an entry in the MongoDB.jobs collection, the
     # job UUID has been assigned, archive_path has been set, and the contents
     # of 'data' passed at init() and/or setup() are merged and stored in
     # the 'data' field of the job.
     #
+    token = get_admin_token(rx.settings.admin_token_key)
+    try:
+        job.reset(token=token)
+    except Exception:
+        rx.logger.warning('Reset failed')
+
     job.setup()
     rx.logger.info("PipelineJob.uuid: {}".format(job.uuid))
     # At this point, but no later in the job lifecycle, the job can be erased
@@ -111,9 +119,9 @@ def main():
     # of asynchronous, event-driven programming. This is a remarkably scalabe,
     # and resilient approach, and its innate composability suggests creation of
     # complex, internlinked workflows.
+    ag_job_id = None
     try:
         resp = rx.client.jobs.submit(body=job_def)
-        ag_job_id = None
         if "id" in resp:
             ag_job_id = resp["id"]
             # Now, send a "run" event to the Job, including for the sake of
@@ -143,7 +151,8 @@ def main():
         pass
 
     # I like to annotate the logs with a terminal success message
-    rx.on_success("Launched Agave Job in {} usec".format(rx.elapsed()))
+    rx.on_success("Launched Agave job {} in {} usec".format(
+        ag_job_id, rx.elapsed()))
 
 
 if __name__ == "__main__":

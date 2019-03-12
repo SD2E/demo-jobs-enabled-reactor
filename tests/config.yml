@@ -24,3 +24,4 @@ mongodb:
 storagesystems:
   data-sd2e-community:
     posix_path: ./store
+admin_token_key: ~
