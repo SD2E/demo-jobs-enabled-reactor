@@ -41,8 +41,8 @@ def main():
     token = get_admin_token(rx.settings.admin_token_key)
     try:
         job.reset(token=token)
-    except Exception:
-        rx.logger.warning('Reset failed')
+    except Exception as exc:
+        rx.logger.warning('Reset failed: {}'.format(exc))
 
     job.setup()
     rx.logger.info("PipelineJob.uuid: {}".format(job.uuid))
