@@ -31,7 +31,8 @@ def main():
     # paths, and more.
 
     job = Job(rx, data=m.get("data", {}),
-              experiment_id=m.get("experiment_id", None))
+              experiment_id=m.get("experiment_id", None),
+              archive_patterns=[{'patterns': ['output.txt$'], 'level': '1'}])
 
     # At this point, there is an entry in the MongoDB.jobs collection, the
     # job UUID has been assigned, archive_path has been set, and the contents
@@ -81,38 +82,11 @@ def main():
     # Agave has many job statuses, and the PipelineJobs System
     # has mappings for all of them. The most important, which are
     # demonstrated below, are RUNNING, ARCHIVING_FINISHED, and FAILED.
-    # These correspond to their analagous PipelineJobs states. In this
-    # example, three notifications are added to the job definition.
-    #
-    # Notifications 101: Agave notifications have three parts: 1) status,
-    # 2) Whether the subscription to the event is 'persistent'. If so, the
-    # Agave system will send a notification every time the event occurs. If not,
-    # only the first occurence will result in a notification. 3) The URL
-    # destination (or callback) to which the HTTP POST will be sent.
-    #
-    # This is where the integration between Agave and Reactors and the Pipeline
-    # system happens. The Job object, after it has been set up, has a property
-    # "callback" which is a URL pointing to the Jobs Manager Reactor, complete
-    # with an authorization key. Posting Agave events to this endpoint will
-    # advance the state of the Job,
+    # These correspond to their analagous PipelineJobs states. This example
+    # leverages ManagedPipelineJob's built-in method for getting a minimal
+    # set of notifications for RUNNING, FINISHED, and FAILED job events.
 
-    job_def["notifications"] = [
-        {
-            "event": "RUNNING",
-            "persistent": True,
-            "url": job.callback + "&status=${JOB_STATUS}",
-        },
-        {
-            "event": "ARCHIVING_FINISHED",
-            "persistent": False,
-            "url": job.callback + "&status=FINISHED",
-        },
-        {
-            "event": "FAILED",
-            "persistent": False,
-            "url": job.callback + "&status=${JOB_STATUS}",
-        },
-    ]
+    job_def["notifications"] = job.agave_notifications()
 
     # Submit the Agave job: The Agave job will send event its updates to
     # our example job via the Jobs Manager Reactor, This will take place even
