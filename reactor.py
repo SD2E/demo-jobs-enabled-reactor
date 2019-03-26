@@ -1,4 +1,4 @@
-from pprint import pprint
+import os
 from requests.exceptions import HTTPError
 
 from reactors.runtime import Reactor, agaveutils
@@ -11,6 +11,8 @@ def main():
     rx = Reactor()
     m = rx.context.message_dict
 
+    for var in os.environ():
+        rx.logger.info('os.environ.{}: {}'.format(var, os.environ[var]))
     # ReactorManagedPipelineJob is pretty simple to set up.
     # Here, values for 'data' and 'sample_id' come from the inbound message.
     #
