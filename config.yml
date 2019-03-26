@@ -8,13 +8,13 @@ mongodb:
   authn: ~
   database: catalog_staging
 pipelines:
-  pipeline_uuid: 106c46ff-8186-5756-a934-071f4497b58d
+  pipeline_uuid: ~
   pipeline_manager_id: pipelines-manager.prod
   pipeline_manager_nonce: ~
-  job_manager_id: jobs-manager.prod
+  job_manager_id: MEzqaw4rkWZoK
   job_manager_nonce: ~
-  job_indexer_id: jobs-indexer.prod
+  job_indexer_id: Pw3eRxrqLZGmp
   job_indexer_nonce: ~
-  permission_manager: pems-agent.prod
+  permission_manager: kyMWvg171Q3G6
   process_uuid: 117a32a1-457c-5bfe-bded-ed0ca99e53f8
 admin_token_key: ~
