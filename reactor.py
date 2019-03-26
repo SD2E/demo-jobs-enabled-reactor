@@ -88,6 +88,8 @@ def main():
 
     job_def["notifications"] = job.agave_notifications()
 
+    rx.logger.info('Job Def: {}'.format(job_def))
+
     # Submit the Agave job: The Agave job will send event its updates to
     # our example job via the Jobs Manager Reactor, This will take place even
     # after the execution of this Reactor has concluded. This is a good example
@@ -104,18 +106,18 @@ def main():
             job.run({"launched": ag_job_id})
         else:
             # Fail the PipelineJob if Agave job fails to launch
-            job.fail()
+            job.cancel()
 
     except HTTPError as h:
         # Report what is likely to be an Agave-specific error
         http_err_resp = agaveutils.process_agave_httperror(h)
-        job.fail({"cause": str(http_err_resp)})
+        job.cancel({"cause": str(http_err_resp)})
         rx.on_failure("Failed to submit job", h)
 
     except Exception as exc:
         # Report what is likely to be an error with this Reactor, the Data
         # Catalog, or the PipelineJobs system components
-        job.fail({"cause": str(exc)})
+        job.cancel()
         rx.on_failure("Failed to launch {}".format(job.uuid), exc)
 
     # Optional: Send an 'update' event to the PipelineJob's
