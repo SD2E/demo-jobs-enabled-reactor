@@ -26,6 +26,7 @@ def main():
         rx.logger.info('os.environ.{}: {}'.format(var, os.environ[var]))
 
     print('Abaco Access Token: {}'.format(os.environ['_abaco_access_token']))
+    print('Client Token: {}'.format(rx.client._token))
     # ReactorManagedPipelineJob is pretty simple to set up.
     # Here, values for 'data' and 'sample_id' come from the inbound message.
     #
