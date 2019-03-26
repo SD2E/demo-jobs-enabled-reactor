@@ -5,11 +5,22 @@ from reactors.runtime import Reactor, agaveutils
 from datacatalog.managers.pipelinejobs import ReactorManagedPipelineJob as Job
 from datacatalog.tokens import get_admin_token
 
+from agavepy.agave import Agave
+
 
 def main():
 
     rx = Reactor()
     m = rx.context.message_dict
+
+    try:
+        ag = Agave(api_server=os.environ.get('_abaco_api_server'),
+                   token=os.environ.get('agave_token'))
+
+        resp = ag.jobs.list()
+        rx.logger.info('Custom Agave Client Resp: {}'.format(resp))
+    except Exception as exc:
+        rx.logger.error('Error: {}'.format(exc))
 
     for var in os.environ:
         rx.logger.info('os.environ.{}: {}'.format(var, os.environ[var]))
