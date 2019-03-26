@@ -8,7 +8,7 @@ mongodb:
   authn: ~
   database: catalog_staging
 pipelines:
-  pipeline_uuid: ~
+  pipeline_uuid: 106c46ff-8186-5756-a934-071f4497b58d
   pipeline_manager_id: pipelines-manager.prod
   pipeline_manager_nonce: ~
   job_manager_id: MEzqaw4rkWZoK
