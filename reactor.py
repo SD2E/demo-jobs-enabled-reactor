@@ -84,7 +84,7 @@ def main():
     job_def = {
         "appId": rx.settings.agave_app_id,
         "name": "word-count-" + rx.nickname,
-        "inputs": m.get("data", {}).get("inputs", {}),
+        "inputs": m.get("data", {}).get("inputs", {"input1": "agave://data-sd2e-community/sample/tacc-cloud/wc-sample.txt"}),
         "maxRunTime": "00:15:00",
     }
 
