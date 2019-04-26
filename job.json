@@ -1,0 +1,28 @@
+{
+    "appId": "word-count-0.1u1",
+    "name": "word-count-needed-hare",
+    "inputs": {
+        "input1": "agave://data-sd2e-community/sample/tacc-cloud/wc-sample.txt"
+    },
+    "maxRunTime": "00:15:00",
+    "archivePath": "/products/v2/106c46ff81865756a934071f4497b58d/BAkwe8wKZY2NgXyBpX8K5R1D/PAVpwrObxp5YjYRvrJOd5yVp",
+    "archiveSystem": "data-sd2e-community",
+    "archive": true,
+    "notifications": [
+        {
+            "event": "RUNNING",
+            "persistent": true,
+            "url": "https://api.sd2e.org//actors/v2/MEzqaw4rkWZoK/messages?x-nonce=*****&token=99cb4e2d4ba22b3a&uuid=10792d3c-395c-57e0-a694-006cf03d3970&session=firm-boar&status=${JOB_STATUS}"
+        },
+        {
+            "event": "ARCHIVING_FINISHED",
+            "persistent": false,
+            "url": "https://api.sd2e.org//actors/v2/MEzqaw4rkWZoK/messages?x-nonce=*****&token=99cb4e2d4ba22b3a&uuid=10792d3c-395c-57e0-a694-006cf03d3970&session=firm-boar&status=FINISHED"
+        },
+        {
+            "event": "FAILED",
+            "persistent": false,
+            "url": "https://api.sd2e.org//actors/v2/MEzqaw4rkWZoK/messages?x-nonce=*****&token=99cb4e2d4ba22b3a&uuid=10792d3c-395c-57e0-a694-006cf03d3970&session=firm-boar&status=${JOB_STATUS}"
+        }
+    ]
+}

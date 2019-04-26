@@ -1,5 +1,5 @@
 FROM sd2e/reactors:python3-edge
-ARG DATACATALOG_BRANCH=2_0
+ARG DATACATALOG_BRANCH=v2.0.0
 
 # Comment out if not actively developing python-datacatalog
 RUN pip uninstall --yes datacatalog
